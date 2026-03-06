@@ -1,0 +1,61 @@
+pip install flask
+python app.py
+
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+players = []
+
+# CREATE Player
+@app.route('/players', methods=['POST'])
+def add_player():
+    player = {
+        "id": len(players)+1,
+        "Player_Name": request.json["Player_Name"],
+        "Age": request.json["Age"],
+        "Country": request.json["Country"],
+        "Runs": request.json["Runs"]
+    }
+    players.append(player)
+    return jsonify(player)
+
+# READ all players
+@app.route('/players', methods=['GET'])
+def get_players():
+    return jsonify(players)
+
+# UPDATE player
+@app.route('/players/<int:id>', methods=['PUT'])
+def update_player(id):
+    for player in players:
+        if player["id"] == id:
+            player["Runs"] = request.json["Runs"]
+            return jsonify(player)
+
+# DELETE player
+@app.route('/players/<int:id>', methods=['DELETE'])
+def delete_player(id):
+    for player in players:
+        if player["id"] == id:
+            players.remove(player)
+            return jsonify({"message":"Player deleted"})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+In postman:
+body mai 
+{
+"Player_Name": "Virat Kohli",
+"Age": 35,
+"Country": "India",
+"Runs": 13000
+}
+
+put:
+{
+"Runs": 15000
+}

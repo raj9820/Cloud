@@ -1,0 +1,65 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+employees = []
+
+# CREATE
+@app.route('/employees', methods=['POST'])
+def add_employee():
+    employee = {
+        "id": len(employees)+1,
+        "Employee_Name": request.json["Employee_Name"],
+        "Age": request.json["Age"],
+        "Phone_no": request.json["Phone_no"],
+        "Department": request.json["Department"]
+    }
+    employees.append(employee)
+    return jsonify(employee)
+
+# READ
+@app.route('/employees', methods=['GET'])
+def get_employees():
+    return jsonify(employees)
+
+# UPDATE
+@app.route('/employees/<int:id>', methods=['PUT'])
+def update_employee(id):
+    for emp in employees:
+        if emp["id"] == id:
+            emp["Department"] = request.json["Department"]
+            return jsonify(emp)
+
+# DELETE
+@app.route('/employees/<int:id>', methods=['DELETE'])
+def delete_employee(id):
+    for emp in employees:
+        if emp["id"] == id:
+            employees.remove(emp)
+            return jsonify({"message":"Employee deleted"})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+post:
+Body → raw → JSON
+
+{
+"Employee_Name":"Rahul",
+"Age":28,
+"Phone_no":"9876543210",
+"Department":"IT"
+}
+
+
+PUT
+
+URL:
+
+http://127.0.0.1:5000/employees/1
+
+Body JSON:
+
+{
+"Department":"HR"
+}

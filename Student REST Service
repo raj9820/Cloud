@@ -1,0 +1,72 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+students = []
+
+# CREATE
+@app.route('/students', methods=['POST'])
+def add_student():
+    student = {
+        "id": len(students)+1,
+        "Student_Name": request.json["Student_Name"],
+        "Age": request.json["Age"],
+        "Phone_no": request.json["Phone_no"],
+        "Subject": request.json["Subject"]
+    }
+    students.append(student)
+    return jsonify(student)
+
+# READ
+@app.route('/students', methods=['GET'])
+def get_students():
+    return jsonify(students)
+
+# UPDATE (update all fields)
+@app.route('/students/<int:id>', methods=['PUT'])
+def update_student(id):
+    for stu in students:
+        if stu["id"] == id:
+            stu["Student_Name"] = request.json["Student_Name"]
+            stu["Age"] = request.json["Age"]
+            stu["Phone_no"] = request.json["Phone_no"]
+            stu["Subject"] = request.json["Subject"]
+            return jsonify(stu)
+
+    return jsonify({"message": "Student not found"}), 404
+
+# DELETE
+@app.route('/students/<int:id>', methods=['DELETE'])
+def delete_student(id):
+    for stu in students:
+        if stu["id"] == id:
+            students.remove(stu)
+            return jsonify({"message": "Student deleted"})
+
+    return jsonify({"message": "Student not found"}), 404
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+http://127.0.0.1:5000/students
+
+Body JSON:
+
+{
+"Student_Name":"Shivangi",
+"Age":21,
+"Phone_no":"9876543210",
+"Subject":"Computer Science"
+}
+
+PUT http://127.0.0.1:5000/students/1
+
+Body:
+
+{
+"Student_Name":"Shivangi Gupta",
+"Age":22,
+"Phone_no":"9876543210",
+"Subject":"AI"
+}

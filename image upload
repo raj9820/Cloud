@@ -1,0 +1,50 @@
+const express = require('express');
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+// Make sure your folder path is correct and accessible
+const UPLOAD_FOLDER = 'D:/practical';
+
+
+// Create folder if it doesn't exist
+if (!fs.existsSync(UPLOAD_FOLDER)) {
+  fs.mkdirSync(UPLOAD_FOLDER, { recursive: true });
+}
+
+// Multer setup for file storage in the UPLOAD_FOLDER
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: UPLOAD_FOLDER,
+    filename: (req, file, cb) => cb(null, file.originalname)
+  })
+});
+
+// Upload route
+app.post('/upload', upload.single('file'), (req, res) => {
+  if (req.file) {
+    res.send(`Uploaded: ${req.file.originalname}`);
+  } else {
+    res.status(400).send('No file uploaded.');
+  }
+});
+
+// Download route
+app.get('/download', (req, res) => {
+  const filePath = path.join(UPLOAD_FOLDER, req.query.filename || '');
+  if (fs.existsSync(filePath)) {
+    res.download(filePath);
+  } else {
+    res.status(404).send('File not found.');
+  }
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
+http://localhost:3000/upload
+http://localhost:3000/download?filename=new.png
